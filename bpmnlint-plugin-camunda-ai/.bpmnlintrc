@@ -1,0 +1,7 @@
+{
+  "extends": "bpmnlint:recommended",
+  "rules": {
+    "camunda-ai/from-ai-tool-call": "error",
+    "camunda-ai/tool-call-result": "info"
+  }
+}

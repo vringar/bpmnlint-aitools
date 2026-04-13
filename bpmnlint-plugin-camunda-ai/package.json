@@ -1,0 +1,16 @@
+{
+  "name": "bpmnlint-plugin-camunda-ai",
+  "version": "0.1.0",
+  "description": "bpmnlint rules for Camunda 8 agentic AI processes",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test test/from-ai-tool-call.test.js test/tool-call-result.test.js"
+  },
+  "peerDependencies": {
+    "bpmnlint": ">=10"
+  },
+  "devDependencies": {
+    "bpmnlint": "^10"
+  },
+  "license": "MIT"
+}
