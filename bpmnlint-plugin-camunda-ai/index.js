@@ -1,6 +1,6 @@
 module.exports = {
   rules: {
-    'from-ai-tool-call': require('./rules/from-ai-tool-call'),
-    'tool-call-result': require('./rules/tool-call-result'),
+    'from-ai-tool-call': './rules/from-ai-tool-call',
+    'tool-call-result': './rules/tool-call-result',
   }
 };
