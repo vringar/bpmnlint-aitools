@@ -34,20 +34,22 @@ function hasToolCallResultOutput(element) {
   return ioMapping.outputParameters.some((p) => p.target === 'toolCallResult');
 }
 
-module.exports = {
-  check(node, reporter) {
-    if (node.$type !== 'bpmn:AdHocSubProcess') return;
+module.exports = function() {
+  return {
+    check(node, reporter) {
+      if (node.$type !== 'bpmn:AdHocSubProcess') return;
 
-    const flowElements = node.flowElements || [];
-    for (const element of flowElements) {
-      if (!ACTIVITY_TYPES.has(element.$type)) continue;
+      const flowElements = node.flowElements || [];
+      for (const element of flowElements) {
+        if (!ACTIVITY_TYPES.has(element.$type)) continue;
 
-      if (!hasToolCallResultOutput(element)) {
-        reporter.report(
-          element.id,
-          'Tool activity result should be stored in "toolCallResult" for the AI Agent connector to collect it'
-        );
+        if (!hasToolCallResultOutput(element)) {
+          reporter.report(
+            element.id,
+            'Tool activity result should be stored in "toolCallResult" for the AI Agent connector to collect it'
+          );
+        }
       }
     }
-  }
+  };
 };

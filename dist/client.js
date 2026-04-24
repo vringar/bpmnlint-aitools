@@ -37,30 +37,32 @@ function isValidFirstArg(arg) {
   return /^toolCall\.[a-zA-Z_$][a-zA-Z0-9_$.]*$/.test(arg);
 }
 
-module.exports = {
-  check(node, reporter) {
-    const extensions = node.extensionElements;
-    if (!extensions || !extensions.values) return;
+module.exports = function() {
+  return {
+    check(node, reporter) {
+      const extensions = node.extensionElements;
+      if (!extensions || !extensions.values) return;
 
-    const ioMapping = extensions.values.find(
-      (v) => v.$type === 'zeebe:IoMapping'
-    );
-    if (!ioMapping || !ioMapping.inputParameters) return;
+      const ioMapping = extensions.values.find(
+        (v) => v.$type === 'zeebe:IoMapping'
+      );
+      if (!ioMapping || !ioMapping.inputParameters) return;
 
-    for (const param of ioMapping.inputParameters) {
-      const source = param.source;
-      if (!source || !source.includes('fromAi')) continue;
+      for (const param of ioMapping.inputParameters) {
+        const source = param.source;
+        if (!source || !source.includes('fromAi')) continue;
 
-      for (const firstArg of getFirstArgs(source)) {
-        if (!isValidFirstArg(firstArg)) {
-          reporter.report(
-            node.id,
-            `fromAi() first argument must reference toolCall.<param>, found: "${firstArg}"`
-          );
+        for (const firstArg of getFirstArgs(source)) {
+          if (!isValidFirstArg(firstArg)) {
+            reporter.report(
+              node.id,
+              `fromAi() first argument must reference toolCall.<param>, found: "${firstArg}"`
+            );
+          }
         }
       }
     }
-  }
+  };
 };
 
 
@@ -108,22 +110,24 @@ function hasToolCallResultOutput(element) {
   return ioMapping.outputParameters.some((p) => p.target === 'toolCallResult');
 }
 
-module.exports = {
-  check(node, reporter) {
-    if (node.$type !== 'bpmn:AdHocSubProcess') return;
+module.exports = function() {
+  return {
+    check(node, reporter) {
+      if (node.$type !== 'bpmn:AdHocSubProcess') return;
 
-    const flowElements = node.flowElements || [];
-    for (const element of flowElements) {
-      if (!ACTIVITY_TYPES.has(element.$type)) continue;
+      const flowElements = node.flowElements || [];
+      for (const element of flowElements) {
+        if (!ACTIVITY_TYPES.has(element.$type)) continue;
 
-      if (!hasToolCallResultOutput(element)) {
-        reporter.report(
-          element.id,
-          'Tool activity result should be stored in "toolCallResult" for the AI Agent connector to collect it'
-        );
+        if (!hasToolCallResultOutput(element)) {
+          reporter.report(
+            element.id,
+            'Tool activity result should be stored in "toolCallResult" for the AI Agent connector to collect it'
+          );
+        }
       }
     }
-  }
+  };
 };
 
 

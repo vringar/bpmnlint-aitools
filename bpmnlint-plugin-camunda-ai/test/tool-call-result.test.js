@@ -1,7 +1,7 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 
-const rule = require('../rules/tool-call-result');
+const rule = require('../rules/tool-call-result')();
 
 function makeActivity(id, outputTargets = []) {
   const outputParameters = outputTargets.map((target) => ({ target }));

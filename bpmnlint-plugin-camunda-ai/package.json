@@ -4,13 +4,15 @@
   "description": "bpmnlint rules for Camunda 8 agentic AI processes",
   "main": "index.js",
   "scripts": {
-    "test": "node --test test/from-ai-tool-call.test.js test/tool-call-result.test.js"
+    "test": "node --test test/from-ai-tool-call.test.js test/tool-call-result.test.js test/linter-smoke.test.js"
   },
   "peerDependencies": {
     "bpmnlint": ">=10"
   },
   "devDependencies": {
-    "bpmnlint": "^10"
+    "bpmn-moddle": "^10.0.0",
+    "bpmnlint": "^11.0.0",
+    "zeebe-bpmn-moddle": "^1.13.0"
   },
   "license": "MIT"
 }

@@ -1,7 +1,7 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 
-const rule = require('../rules/from-ai-tool-call');
+const rule = require('../rules/from-ai-tool-call')();
 
 function makeNode(inputSources) {
   const inputParameters = inputSources.map((source) => ({ source }));
