@@ -77,6 +77,46 @@ describe('bpmnlint integration', () => {
     assert.equal(reports[0].id, 'Task_A');
   });
 
+  it('tool-call-result accepts resultExpression header assigning toolCallResult', async () => {
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<definitions ${NS_DEFS}>
+  <process id="P" isExecutable="true">
+    <adHocSubProcess id="AdHoc_1">
+      <serviceTask id="Task_HTTP">
+        <extensionElements>
+          <zeebe:taskHeaders>
+            <zeebe:header key="resultExpression" value="= {&quot;toolCallResult&quot;: {&quot;version&quot;: response.body.version}}" />
+          </zeebe:taskHeaders>
+        </extensionElements>
+      </serviceTask>
+    </adHocSubProcess>
+  </process>
+</definitions>`;
+    const results = await lint(xml);
+    assert.deepEqual(results['camunda-ai/tool-call-result'] || [], []);
+  });
+
+  it('tool-call-result flags resultExpression header that does not assign toolCallResult', async () => {
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<definitions ${NS_DEFS}>
+  <process id="P" isExecutable="true">
+    <adHocSubProcess id="AdHoc_1">
+      <serviceTask id="Task_Bad">
+        <extensionElements>
+          <zeebe:taskHeaders>
+            <zeebe:header key="resultExpression" value="= {&quot;somethingElse&quot;: response.body.version}" />
+          </zeebe:taskHeaders>
+        </extensionElements>
+      </serviceTask>
+    </adHocSubProcess>
+  </process>
+</definitions>`;
+    const results = await lint(xml);
+    const reports = results['camunda-ai/tool-call-result'] || [];
+    assert.equal(reports.length, 1);
+    assert.equal(reports[0].id, 'Task_Bad');
+  });
+
   it('clean diagram produces no reports', async () => {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <definitions ${NS_DEFS}>

@@ -20,6 +20,21 @@ function makeActivity(id, outputTargets = []) {
   };
 }
 
+function makeActivityWithHeaders(id, headers = []) {
+  return {
+    id,
+    $type: 'bpmn:ServiceTask',
+    extensionElements: {
+      values: [
+        {
+          $type: 'zeebe:TaskHeaders',
+          values: headers,
+        },
+      ],
+    },
+  };
+}
+
 function makeAdHocSubProcess(flowElements) {
   return {
     id: 'AdHocSubProcess_1',
@@ -112,5 +127,43 @@ describe('tool-call-result', () => {
     const node = { id: 'AdHoc_1', $type: 'bpmn:AdHocSubProcess' };
     assert.doesNotThrow(() => collectReports(node));
     assert.deepEqual(collectReports(node), []);
+  });
+
+  it('passes when resultExpression header assigns toolCallResult', () => {
+    const node = makeAdHocSubProcess([
+      makeActivityWithHeaders('Task_1', [
+        {
+          key: 'resultExpression',
+          value:
+            '= {\n  "toolCallResult": {\n    "version": response.body.version\n  }\n}',
+        },
+      ]),
+    ]);
+    assert.deepEqual(collectReports(node), []);
+  });
+
+  it('reports when resultExpression header does not assign toolCallResult', () => {
+    const node = makeAdHocSubProcess([
+      makeActivityWithHeaders('Task_1', [
+        {
+          key: 'resultExpression',
+          value: '= {"somethingElse": response.body.version}',
+        },
+      ]),
+    ]);
+    const reports = collectReports(node);
+    assert.equal(reports.length, 1);
+    assert.equal(reports[0].id, 'Task_1');
+  });
+
+  it('reports when task headers are present but resultExpression is missing', () => {
+    const node = makeAdHocSubProcess([
+      makeActivityWithHeaders('Task_1', [
+        { key: 'otherHeader', value: 'toolCallResult' },
+      ]),
+    ]);
+    const reports = collectReports(node);
+    assert.equal(reports.length, 1);
+    assert.equal(reports[0].id, 'Task_1');
   });
 });

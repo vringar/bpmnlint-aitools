@@ -34,6 +34,25 @@ function hasToolCallResultOutput(element) {
   return ioMapping.outputParameters.some((p) => p.target === 'toolCallResult');
 }
 
+function hasToolCallResultHeader(element) {
+  const extensions = element.extensionElements;
+  if (!extensions || !extensions.values) return false;
+
+  const taskHeaders = extensions.values.find(
+    (v) => v.$type === 'zeebe:TaskHeaders'
+  );
+  if (!taskHeaders || !taskHeaders.values) return false;
+
+  const resultExpr = taskHeaders.values.find(
+    (h) => h.key === 'resultExpression'
+  );
+  return (
+    resultExpr != null &&
+    typeof resultExpr.value === 'string' &&
+    resultExpr.value.includes('toolCallResult')
+  );
+}
+
 module.exports = function() {
   return {
     check(node, reporter) {
@@ -43,7 +62,10 @@ module.exports = function() {
       for (const element of flowElements) {
         if (!ACTIVITY_TYPES.has(element.$type)) continue;
 
-        if (!hasToolCallResultOutput(element)) {
+        if (
+          !hasToolCallResultOutput(element) &&
+          !hasToolCallResultHeader(element)
+        ) {
           reporter.report(
             element.id,
             'Tool activity result should be stored in "toolCallResult" for the AI Agent connector to collect it'
