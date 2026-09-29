@@ -1,0 +1,18 @@
+{
+  "name": "camunda-spacing-guides",
+  "version": "0.1.0",
+  "description": "Camunda Modeler plug-in showing PowerPoint-style equal-spacing guides while dragging BPMN elements",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack",
+    "test": "node --test test/gapMath.test.js",
+    "dev": "webpack serve --config dev/webpack.config.js --open"
+  },
+  "devDependencies": {
+    "bpmn-js": "^18.0.0",
+    "camunda-modeler-plugin-helpers": "^6.0.0",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^7.0.0",
+    "webpack-dev-server": "^5.0.0"
+  }
+}
